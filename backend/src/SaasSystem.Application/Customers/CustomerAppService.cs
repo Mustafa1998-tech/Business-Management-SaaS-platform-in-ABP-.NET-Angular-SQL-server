@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using SaasSystem.Domain.Entities;
 using SaasSystem.Permissions;
 using Volo.Abp.Application.Dtos;
+using Volo.Abp.Application.Services;
 using Volo.Abp.Domain.Repositories;
 using Volo.Abp.Guids;
 using Volo.Abp.MultiTenancy;
@@ -10,7 +11,7 @@ using Volo.Abp.MultiTenancy;
 namespace SaasSystem.Customers;
 
 [Authorize(SaasSystemPermissions.Customers.Default)]
-public class CustomerAppService : ICustomerAppService
+public class CustomerAppService : ApplicationService, ICustomerAppService
 {
     private readonly IRepository<Customer, Guid> _customerRepository;
     private readonly ICurrentTenant _currentTenant;

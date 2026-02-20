@@ -3,12 +3,13 @@ using Microsoft.AspNetCore.Authorization;
 using SaasSystem.Domain.Entities;
 using SaasSystem.Permissions;
 using Volo.Abp.Application.Dtos;
+using Volo.Abp.Application.Services;
 using Volo.Abp.Domain.Repositories;
 
 namespace SaasSystem.Payments;
 
 [Authorize(SaasSystemPermissions.Payments.Default)]
-public class PaymentAppService : IPaymentAppService
+public class PaymentAppService : ApplicationService, IPaymentAppService
 {
     private readonly IRepository<Payment, Guid> _repository;
 

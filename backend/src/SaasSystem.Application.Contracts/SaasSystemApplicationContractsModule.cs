@@ -1,5 +1,6 @@
 using Volo.Abp.Account;
 using Volo.Abp.Identity;
+using Volo.Abp.Localization;
 using Volo.Abp.Modularity;
 using Volo.Abp.PermissionManagement;
 using Volo.Abp.TenantManagement;
@@ -14,4 +15,11 @@ namespace SaasSystem;
     typeof(AbpTenantManagementApplicationContractsModule))]
 public class SaasSystemApplicationContractsModule : AbpModule
 {
+    public override void ConfigureServices(ServiceConfigurationContext context)
+    {
+        Configure<AbpLocalizationOptions>(options =>
+        {
+            options.DefaultResourceType = typeof(SaasSystemResource);
+        });
+    }
 }

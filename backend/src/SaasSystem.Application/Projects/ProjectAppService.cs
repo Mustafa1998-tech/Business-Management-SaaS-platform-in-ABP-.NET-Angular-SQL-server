@@ -3,12 +3,13 @@ using Microsoft.AspNetCore.Authorization;
 using SaasSystem.Domain.Entities;
 using SaasSystem.Permissions;
 using Volo.Abp.Application.Dtos;
+using Volo.Abp.Application.Services;
 using Volo.Abp.Domain.Repositories;
 
 namespace SaasSystem.Projects;
 
 [Authorize(SaasSystemPermissions.Projects.Default)]
-public class ProjectAppService : IProjectAppService
+public class ProjectAppService : ApplicationService, IProjectAppService
 {
     private readonly IRepository<Project, Guid> _repository;
 

@@ -3,12 +3,13 @@ using Microsoft.AspNetCore.Authorization;
 using SaasSystem.Domain.Entities;
 using SaasSystem.Permissions;
 using Volo.Abp.Application.Dtos;
+using Volo.Abp.Application.Services;
 using Volo.Abp.Domain.Repositories;
 
 namespace SaasSystem.Invoices;
 
 [Authorize(SaasSystemPermissions.Invoices.Default)]
-public class InvoiceAppService : IInvoiceAppService
+public class InvoiceAppService : ApplicationService, IInvoiceAppService
 {
     private readonly IRepository<Invoice, Guid> _repository;
 
