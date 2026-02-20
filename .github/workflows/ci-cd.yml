@@ -29,7 +29,7 @@ jobs:
       - name: Build backend
         run: dotnet build backend/SaasSystem.slnx -c Release --no-restore
       - name: Install frontend dependencies
-        run: npm ci
+        run: npm ci --legacy-peer-deps
         working-directory: frontend
       - name: Build frontend
         run: npm run build
@@ -56,7 +56,7 @@ jobs:
         run: |
           dotnet test backend/SaasSystem.slnx -c Release --collect:"XPlat Code Coverage" --logger trx
       - name: Install frontend dependencies
-        run: npm ci
+        run: npm ci --legacy-peer-deps
         working-directory: frontend
       - name: Run frontend lint
         run: npm run lint
@@ -120,7 +120,7 @@ jobs:
       - name: Scan dotnet packages
         run: dotnet list backend/SaasSystem.slnx package --vulnerable
       - name: Install frontend dependencies
-        run: npm ci
+        run: npm ci --legacy-peer-deps
         working-directory: frontend
       - name: Scan npm packages
         run: npm audit --audit-level=critical
