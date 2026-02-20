@@ -1,0 +1,41 @@
+<div class="card-shell">
+  <table class="table table-sm align-middle mb-0">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Phone</th>
+        <th>Status</th>
+        <th class="text-end">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let customer of customers; trackBy: trackByCustomer">
+        <td>{{ customer.name }}</td>
+        <td>{{ customer.email }}</td>
+        <td>{{ customer.phone }}</td>
+        <td>
+          <span class="badge" [class.bg-success]="customer.isActive" [class.bg-secondary]="!customer.isActive">
+            {{ customer.isActive ? 'Active' : 'Inactive' }}
+          </span>
+        </td>
+        <td class="text-end">
+          <button type="button" class="btn btn-outline-primary btn-sm me-1" *abpPermission="'SaasSystem.Customers.Update'" (click)="edit.emit(customer)">
+            Edit
+          </button>
+          <button type="button" class="btn btn-outline-danger btn-sm" *abpPermission="'SaasSystem.Customers.Delete'" (click)="remove.emit(customer)">
+            Delete
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="d-flex justify-content-between align-items-center mt-3">
+    <small class="text-muted">Total: {{ totalCount }}</small>
+    <div>
+      <button type="button" class="btn btn-sm btn-light me-1" (click)="goToPreviousPage()">Prev</button>
+      <button type="button" class="btn btn-sm btn-light" (click)="goToNextPage()">Next</button>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,18 @@
+.kanban-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.column-drop-zone {
+  min-height: 150px;
+}
+
+.task-card {
+  padding: 0.75rem;
+  margin-bottom: 0.5rem;
+  border: 1px solid #dde6f0;
+  border-radius: 10px;
+  background: #fbfdff;
+  cursor: move;
+}

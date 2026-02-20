@@ -1,0 +1,19 @@
+<div class="page-shell">
+  <h2 class="mb-3">Task Board</h2>
+
+  <app-loading-state *ngIf="isLoading" message="kanban board"></app-loading-state>
+  <app-error-state *ngIf="hasError" (retry)="load()"></app-error-state>
+
+  <div class="kanban-grid" *ngIf="!isLoading && !hasError">
+    <div class="kanban-column card-shell" *ngFor="let column of columns; trackBy: trackByColumn">
+      <h6>{{ column.label }}</h6>
+
+      <div cdkDropList [cdkDropListData]="column.tasks" class="column-drop-zone" (cdkDropListDropped)="drop($event, column.status)">
+        <div class="task-card" *ngFor="let task of column.tasks; trackBy: trackByTask" cdkDrag>
+          <div class="fw-semibold">{{ task.title }}</div>
+          <small class="text-muted">Due: {{ task.dueDate || 'N/A' }}</small>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

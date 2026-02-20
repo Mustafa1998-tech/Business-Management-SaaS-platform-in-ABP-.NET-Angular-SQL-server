@@ -1,0 +1,19 @@
+<div class="page-shell">
+  <h2 class="mb-3">Dashboard</h2>
+
+  <app-loading-state *ngIf="isLoading" message="dashboard"></app-loading-state>
+  <app-error-state *ngIf="hasError" (retry)="load()"></app-error-state>
+
+  <div *ngIf="!isLoading && !hasError && stats" class="row g-3">
+    <div class="col-md-3" *ngFor="let value of [stats.totalCustomers, stats.activeProjects, stats.pendingTasks, stats.outstandingInvoices]; let i = index; trackBy: trackByMetric">
+      <div class="card-shell">
+        <div class="small text-muted">Metric {{ i + 1 }}</div>
+        <div class="h4 mb-0">{{ value }}</div>
+      </div>
+    </div>
+
+    <div class="col-12">
+      <div class="card-shell" [innerHTML]="reportSummaryHtml"></div>
+    </div>
+  </div>
+</div>

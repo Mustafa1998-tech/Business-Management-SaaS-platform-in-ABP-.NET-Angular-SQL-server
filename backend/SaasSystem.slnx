@@ -1,0 +1,16 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/SaasSystem.Application.Contracts/SaasSystem.Application.Contracts.csproj" />
+    <Project Path="src/SaasSystem.Application/SaasSystem.Application.csproj" />
+    <Project Path="src/SaasSystem.DbMigrator/SaasSystem.DbMigrator.csproj" />
+    <Project Path="src/SaasSystem.Domain.Shared/SaasSystem.Domain.Shared.csproj" />
+    <Project Path="src/SaasSystem.Domain/SaasSystem.Domain.csproj" />
+    <Project Path="src/SaasSystem.EntityFrameworkCore/SaasSystem.EntityFrameworkCore.csproj" />
+    <Project Path="src/SaasSystem.HttpApi.Host/SaasSystem.HttpApi.Host.csproj" />
+    <Project Path="src/SaasSystem.HttpApi/SaasSystem.HttpApi.csproj" />
+  </Folder>
+  <Folder Name="/test/">
+    <Project Path="test/SaasSystem.Application.Tests/SaasSystem.Application.Tests.csproj" />
+    <Project Path="test/SaasSystem.HttpApi.Host.IntegrationTests/SaasSystem.HttpApi.Host.IntegrationTests.csproj" />
+  </Folder>
+</Solution>

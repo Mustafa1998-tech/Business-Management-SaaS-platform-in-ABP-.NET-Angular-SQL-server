@@ -1,0 +1,9 @@
+{
+  "title": "SaaS API Core Metrics",
+  "panels": [
+    { "title": "API Latency", "type": "timeseries" },
+    { "title": "Request Rate", "type": "timeseries" },
+    { "title": "Error Rate", "type": "timeseries" },
+    { "title": "Pod CPU/Memory", "type": "timeseries" }
+  ]
+}

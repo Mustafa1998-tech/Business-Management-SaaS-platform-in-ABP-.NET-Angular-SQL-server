@@ -1,0 +1,47 @@
+# OS / editor
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+.idea/
+.vscode/
+
+# Environment files (keep templates tracked)
+.env
+.env.*
+!.env.example
+
+# Logs / temp
+*.log
+.logs/
+logs/
+*.pid
+*.tmp
+*.temp
+
+# .NET build outputs
+**/bin/
+**/obj/
+**/TestResults/
+**/coverage/
+**/*.user
+**/*.suo
+**/*.cache
+
+# Node / frontend outputs
+frontend/node_modules/
+frontend/dist/
+frontend/coverage/
+frontend/.angular/
+frontend/test-results/
+frontend/playwright-report/
+frontend/.eslintcache
+
+# Generated local artifacts
+invoices-export.xlsx
+invoices-export.pdf
+invoices-export-check.xlsx
+invoices-export-check.pdf
+token.txt
+token-response.json
+

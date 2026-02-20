@@ -1,0 +1,130 @@
+<div class="page-shell reports-page">
+  <div class="card-shell filters-card">
+    <div class="filters-head">
+      <h2>Reports</h2>
+      <p>Invoice reporting with professional exports (Excel and PDF).</p>
+    </div>
+
+    <form class="filters-grid" [formGroup]="form" (ngSubmit)="applyFilters()">
+      <label>
+        <span>From Date</span>
+        <input type="date" formControlName="fromDate" class="form-control" />
+      </label>
+
+      <label>
+        <span>To Date</span>
+        <input type="date" formControlName="toDate" class="form-control" />
+      </label>
+
+      <label>
+        <span>Customer</span>
+        <select formControlName="customerId" class="form-select">
+          <option value="">All customers</option>
+          <option *ngFor="let customer of customers" [value]="customer.id">{{ customer.name }}</option>
+        </select>
+      </label>
+
+      <label>
+        <span>Status</span>
+        <select formControlName="status" class="form-select">
+          <option *ngFor="let option of statusOptions" [value]="option.value">{{ option.label }}</option>
+        </select>
+      </label>
+
+      <div class="action-row">
+        <button class="btn btn-primary" type="submit" [disabled]="isLoading">Apply Filters</button>
+        <button class="btn btn-outline-secondary" type="button" (click)="resetFilters()" [disabled]="isLoading">
+          Reset
+        </button>
+      </div>
+
+      <div class="export-row">
+        <button
+          class="btn btn-success"
+          type="button"
+          (click)="exportExcel()"
+          [disabled]="isExcelExporting || isLoading"
+        >
+          {{ isExcelExporting ? 'Exporting Excel...' : 'Export Excel' }}
+        </button>
+
+        <button
+          class="btn btn-outline-primary"
+          type="button"
+          (click)="exportPdf()"
+          [disabled]="isPdfExporting || isLoading"
+        >
+          {{ isPdfExporting ? 'Exporting PDF...' : 'Export PDF' }}
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <app-loading-state *ngIf="isLoading"></app-loading-state>
+
+  <app-error-state *ngIf="!isLoading && errorMessage" [message]="errorMessage"></app-error-state>
+
+  <ng-container *ngIf="!isLoading && !errorMessage">
+    <div class="summary-grid">
+      <article class="card-shell summary-card">
+        <h3>Total Revenue</h3>
+        <strong>{{ report.summary.totalRevenue | number: '1.2-2' }} SAR</strong>
+      </article>
+
+      <article class="card-shell summary-card">
+        <h3>Total Invoices</h3>
+        <strong>{{ report.summary.totalInvoices }}</strong>
+      </article>
+
+      <article class="card-shell summary-card">
+        <h3>Paid</h3>
+        <strong class="paid">{{ report.summary.paidInvoices }}</strong>
+      </article>
+
+      <article class="card-shell summary-card">
+        <h3>Pending</h3>
+        <strong class="pending">{{ report.summary.pendingInvoices }}</strong>
+      </article>
+
+      <article class="card-shell summary-card">
+        <h3>Overdue</h3>
+        <strong class="overdue">{{ report.summary.overdueInvoices }}</strong>
+      </article>
+    </div>
+
+    <div class="card-shell table-card" *ngIf="report.items.length > 0; else noRows">
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead>
+            <tr>
+              <th>Invoice No</th>
+              <th>Customer</th>
+              <th>Project</th>
+              <th class="text-end">Amount</th>
+              <th>Status</th>
+              <th>Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of report.items; trackBy: trackByInvoice">
+              <td>{{ item.invoiceNo }}</td>
+              <td>{{ item.customerName }}</td>
+              <td>{{ item.projectName }}</td>
+              <td class="text-end">{{ item.amount | number: '1.2-2' }} SAR</td>
+              <td>
+                <span class="status-pill" [ngClass]="getStatusClass(item.status)">
+                  {{ getStatusLabel(item.status) }}
+                </span>
+              </td>
+              <td>{{ item.date | date: 'yyyy-MM-dd' }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <ng-template #noRows>
+      <app-empty-state message="No invoice records found for the selected filters."></app-empty-state>
+    </ng-template>
+  </ng-container>
+</div>

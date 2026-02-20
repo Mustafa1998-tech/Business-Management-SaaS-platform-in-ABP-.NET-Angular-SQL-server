@@ -1,0 +1,46 @@
+<ng-container *ngIf="!isLoginRoute; else loginLayout">
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-title">SaaS System</div>
+        <div class="brand-subtitle">Business Management</div>
+      </div>
+
+      <nav class="nav-list">
+        <a
+          *ngFor="let item of visibleNavigationItems; trackBy: trackByPath"
+          [routerLink]="item.path"
+          routerLinkActive="active"
+          class="nav-link">
+          {{ item.label }}
+        </a>
+      </nav>
+    </aside>
+
+    <section class="workspace">
+      <header class="topbar">
+        <div class="crumbs">
+          <span *ngFor="let crumb of breadcrumb; let isLast = last">
+            {{ crumb }}<span *ngIf="!isLast"> / </span>
+          </span>
+        </div>
+
+        <button type="button" class="btn btn-outline-primary btn-sm" (click)="logout()">
+          Logout
+        </button>
+      </header>
+
+      <main class="workspace-body">
+        <router-outlet></router-outlet>
+      </main>
+
+      <footer class="workspace-footer">
+        SaaS System {{ currentYear }}
+      </footer>
+    </section>
+  </div>
+</ng-container>
+
+<ng-template #loginLayout>
+  <router-outlet></router-outlet>
+</ng-template>

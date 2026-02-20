@@ -1,0 +1,147 @@
+name: ci-cd
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  restore:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Restore backend
+        run: dotnet restore backend/SaasSystem.slnx
+      - name: Install frontend dependencies
+        run: |
+          cd frontend
+          npm install
+
+  build:
+    runs-on: ubuntu-latest
+    needs: restore
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Build backend
+        run: dotnet build backend/SaasSystem.slnx -c Release --no-restore
+      - name: Build frontend
+        run: |
+          cd frontend
+          npm ci
+          npm run build
+
+  test:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Backend lint (dotnet format)
+        run: dotnet format backend/SaasSystem.slnx --verify-no-changes
+      - name: Run backend tests with coverage
+        run: |
+          dotnet test backend/SaasSystem.slnx -c Release --collect:"XPlat Code Coverage" --logger trx
+      - name: Install frontend dependencies
+        run: |
+          cd frontend
+          npm ci
+      - name: Run frontend lint
+        run: |
+          cd frontend
+          npm run lint
+      - name: Run frontend tests with coverage
+        run: |
+          cd frontend
+          npm run test
+      - name: Run frontend e2e smoke
+        run: |
+          cd frontend
+          npx playwright install --with-deps chromium
+          npm run e2e
+
+  code-quality:
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: SonarSource/sonarqube-scan-action@v5
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+      - name: SonarQube Quality Gate
+        uses: SonarSource/sonarqube-quality-gate-action@v1.2.0
+        timeout-minutes: 10
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+
+  security-scan:
+    runs-on: ubuntu-latest
+    needs: code-quality
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Scan dotnet packages
+        run: dotnet list backend/SaasSystem.slnx package --vulnerable
+      - name: Scan npm packages
+        run: |
+          cd frontend
+          npm audit --audit-level=high
+
+  docker:
+    runs-on: ubuntu-latest
+    needs: security-scan
+    steps:
+      - uses: actions/checkout@v4
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Build and push API image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: devops/docker/Dockerfile.api
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/saas-api:latest
+      - name: Build and push Angular image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: devops/docker/Dockerfile.angular
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/saas-angular:latest
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: docker
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set kubectl context
+        run: echo "Configure your kube context secret before enabling deploy"
+      - name: Helm deploy
+        run: helm upgrade --install saas ./devops/helm-chart --namespace saas-system --create-namespace

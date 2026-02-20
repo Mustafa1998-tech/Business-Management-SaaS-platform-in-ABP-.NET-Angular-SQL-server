@@ -1,0 +1,44 @@
+<div class="page-shell">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+      <h2 class="mb-1">Car Details</h2>
+      <div class="text-muted small">{{ name }} - {{ carId }}</div>
+    </div>
+    <button class="btn btn-primary">Add To Order</button>
+  </div>
+
+  <div class="row g-3">
+    <div class="col-lg-7">
+      <div class="card-shell media-shell">
+        <div class="media-title">360 Viewer</div>
+        <div class="viewer-placeholder">
+          360 degree viewer placeholder
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-5">
+      <div class="card-shell mb-3">
+        <h5 class="mb-3">Specifications</h5>
+        <div class="spec-row" *ngFor="let spec of specs">
+          <span class="text-muted">{{ spec.label }}</span>
+          <strong>{{ spec.value }}</strong>
+        </div>
+      </div>
+
+      <div class="card-shell">
+        <h5 class="mb-3">Color</h5>
+        <div class="d-flex flex-wrap gap-2">
+          <button
+            *ngFor="let color of colors"
+            type="button"
+            class="btn btn-outline-secondary"
+            [class.btn-primary]="selectedColor === color"
+            (click)="selectedColor = color">
+            {{ color }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

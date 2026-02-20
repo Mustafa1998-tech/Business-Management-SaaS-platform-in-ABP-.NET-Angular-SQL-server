@@ -1,0 +1,33 @@
+namespace: saas-system
+
+api:
+  image: yourdockerhub/saas-api
+  tag: latest
+  replicas: 2
+  resources:
+    requests:
+      cpu: 200m
+      memory: 256Mi
+    limits:
+      cpu: "1"
+      memory: 1Gi
+
+angular:
+  image: yourdockerhub/saas-angular
+  tag: latest
+  replicas: 2
+
+sqlserver:
+  image: mcr.microsoft.com/mssql/server:2022-latest
+  storage: 20Gi
+  saPassword: ""
+
+ingress:
+  className: nginx
+  host: saas.local
+
+config:
+  aspnetcoreEnvironment: Production
+  corsOrigins: https://saas.local
+
+connectionString: ""

@@ -1,0 +1,40 @@
+version: '3.9'
+
+services:
+  api:
+    build:
+      context: ..
+      dockerfile: devops/docker/Dockerfile.api
+    container_name: saas-api
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ConnectionStrings__Default: ${ConnectionStrings__Default_Docker}
+    ports:
+      - '8080:8080'
+    depends_on:
+      - sqlserver
+
+  angular:
+    build:
+      context: ..
+      dockerfile: devops/docker/Dockerfile.angular
+    container_name: saas-angular
+    ports:
+      - '4200:80'
+    depends_on:
+      - api
+
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: saas-sqlserver
+    environment:
+      ACCEPT_EULA: 'Y'
+      MSSQL_PID: 'Developer'
+      SA_PASSWORD: ${SA_PASSWORD}
+    ports:
+      - '1433:1433'
+    volumes:
+      - sql-data:/var/opt/mssql
+
+volumes:
+  sql-data:

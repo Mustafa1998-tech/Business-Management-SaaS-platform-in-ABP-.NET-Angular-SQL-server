@@ -1,0 +1,42 @@
+<div class="page-shell">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="mb-0">Customers</h2>
+    <button type="button" class="btn btn-primary" *abpPermission="'SaasSystem.Customers.Create'" (click)="openCreateModal()">
+      New Customer
+    </button>
+  </div>
+
+  <div class="card-shell mb-3">
+    <div class="row g-2 align-items-end">
+      <div class="col-md-4">
+        <label class="form-label">Filter</label>
+        <input class="form-control" [(ngModel)]="filter" placeholder="Search by name or email" />
+      </div>
+      <div class="col-md-2">
+        <button type="button" class="btn btn-outline-primary" (click)="pageIndex = 0; load()">Apply</button>
+      </div>
+    </div>
+  </div>
+
+  <app-loading-state *ngIf="isLoading" message="customers"></app-loading-state>
+  <app-error-state *ngIf="hasError" (retry)="load()"></app-error-state>
+  <app-empty-state *ngIf="!isLoading && !hasError && customers.length === 0" message="No customers found for this filter"></app-empty-state>
+
+  <app-customers-table
+    *ngIf="!isLoading && !hasError && customers.length > 0"
+    [customers]="customers"
+    [totalCount]="totalCount"
+    [pageIndex]="pageIndex"
+    [pageSize]="pageSize"
+    (edit)="openEditModal($event)"
+    (remove)="deleteCustomer($event)"
+    (pageChanged)="onPageChanged($event)">
+  </app-customers-table>
+
+  <app-customer-form-modal
+    [visible]="modalVisible"
+    [isSubmitting]="isSaving"
+    (cancel)="closeModal()"
+    (save)="saveCustomer($event)">
+  </app-customer-form-modal>
+</div>
