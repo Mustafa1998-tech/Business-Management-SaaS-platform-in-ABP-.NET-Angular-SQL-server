@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { Router, UrlTree } from '@angular/router';
+import { ActivatedRouteSnapshot, Router, RouterStateSnapshot, UrlTree } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { AuthService, PermissionService } from '@abp/ng.core';
 import { firstValueFrom, Observable, of } from 'rxjs';
@@ -28,8 +28,8 @@ describe('policyGuard', () => {
   });
 
   function execute(requiredPolicy?: string, url = '/cars') {
-    const route = { data: requiredPolicy ? { requiredPolicy } : {} } as any;
-    const state = { url } as any;
+    const route = { data: requiredPolicy ? { requiredPolicy } : {} } as unknown as ActivatedRouteSnapshot;
+    const state = { url } as RouterStateSnapshot;
     return TestBed.runInInjectionContext(() => policyGuard(route, state));
   }
 

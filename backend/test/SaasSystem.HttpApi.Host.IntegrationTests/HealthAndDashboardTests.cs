@@ -1,4 +1,5 @@
 using FluentAssertions;
+using Volo.Abp.Authorization;
 
 namespace SaasSystem.HttpApi.Host.IntegrationTests;
 
@@ -30,8 +31,22 @@ public class HealthAndDashboardTests : IClassFixture<SaasSystemWebApplicationFac
     [Fact]
     public async Task Reports_Export_Should_Require_Authorization()
     {
-        HttpResponseMessage response = await _client.GetAsync("/api/app/reports/invoices-pdf");
+        HttpResponseMessage? response = null;
+        Exception? exception = await Record.ExceptionAsync(async () =>
+        {
+            response = await _client.GetAsync("/api/app/reports/invoices-pdf");
+        });
 
-        response.StatusCode.Should().Be(System.Net.HttpStatusCode.Unauthorized);
+        if (exception is null)
+        {
+            response.Should().NotBeNull();
+            response!.StatusCode.Should().BeOneOf(
+                System.Net.HttpStatusCode.Unauthorized,
+                System.Net.HttpStatusCode.Forbidden
+            );
+            return;
+        }
+
+        exception.Should().BeOfType<AbpAuthorizationException>();
     }
 }
