@@ -129,6 +129,160 @@
 - **الوقاية**
   - اربط assertions بسلوك HttpTestingController الفعلي وليس افتراضات عامة.
 
+## الحالة 7: خطأ 500 في `GET /api/app/customers`
+
+- **الأعراض**
+  - واجهة العملاء لا تعرض البيانات.
+  - الطلب `GET /api/app/customers?...` يرجع `500 Internal Server Error`.
+- **السبب الجذري**
+  - بعض App Services لم تكن موروثة من `ApplicationService` مما أثّر على سلوك ABP الافتراضي (authorization/localization/context wiring).
+- **الملفات المتأثرة**
+  - `backend/src/SaasSystem.Application/Customers/CustomerAppService.cs`
+  - `backend/src/SaasSystem.Application/Projects/ProjectAppService.cs`
+  - `backend/src/SaasSystem.Application/Invoices/InvoiceAppService.cs`
+  - `backend/src/SaasSystem.Application/Payments/PaymentAppService.cs`
+- **ما تغيّر**
+  - توحيد الوراثة من `ApplicationService`.
+- **لماذا نجح الحل**
+  - رجع سلوك ABP القياسي للخدمات التطبيقية، وانتهى خطأ `500`.
+- **الوقاية**
+  - أي App Service جديدة يجب أن ترث من `ApplicationService` إلا لو في سبب معماري واضح.
+
+## الحالة 8: تحذير Localization في Angular (`defaultResourceName was not defined`)
+
+- **الأعراض**
+  - تحذير متكرر في المتصفح:
+    - `Localization source name is not specified and the defaultResourceName was not defined!`
+- **السبب الجذري**
+  - لم يتم تعيين resource افتراضي في طبقة العقود.
+- **الملفات المتأثرة**
+  - `backend/src/SaasSystem.Application.Contracts/SaasSystemApplicationContractsModule.cs`
+- **ما تغيّر**
+  - تعيين:
+    - `options.DefaultResourceType = typeof(SaasSystemResource);`
+- **لماذا نجح الحل**
+  - صار ABP يعرف مصدر localization الافتراضي.
+- **الوقاية**
+  - عند إضافة Resource جديد، ثبّت `DefaultResourceType` مبكرًا.
+
+## الحالة 9: فشل GitHub Actions بسبب استخدام `secrets.*` في job-level `if`
+
+- **الأعراض**
+  - فشل workflow قبل التشغيل مع خطأ parsing:
+    - `Unrecognized named-value: 'secrets'`
+- **السبب الجذري**
+  - استخدام `secrets.*` مباشرة داخل شرط `if` على مستوى job.
+- **الملفات المتأثرة**
+  - `.github/workflows/ci-cd.yml`
+- **ما تغيّر**
+  - إزالة `secrets.*` من job-level condition.
+  - إضافة خطوات precheck (`sonar_config`, `docker_config`) وتفعيل/تعطيل الخطوات عبر outputs.
+- **لماذا نجح الحل**
+  - workflow صار valid نحويًا، مع gate منطقي حسب توفر الأسرار.
+- **الوقاية**
+  - تجنب الاعتماد على `secrets.*` في job-level `if` عندما يظهر تعارض parsing، واستخدم step outputs كبديل.
+
+## الحالة 10: فشل CI في `setup-dotnet` بسبب cache lockfile
+
+- **الأعراض**
+  - مرحلة build تفشل مبكرًا في إعداد .NET.
+- **السبب الجذري**
+  - `actions/setup-dotnet` مع `cache: true` يتطلب lockfile للحزم (`packages.lock.json`) غير موجود في المشروع.
+- **الملفات المتأثرة**
+  - `.github/workflows/ci-cd.yml`
+- **ما تغيّر**
+  - إزالة `cache: true` من خطوات `setup-dotnet`.
+- **لماذا نجح الحل**
+  - اختفى الشرط الإجباري للـ lockfile في CI.
+- **الوقاية**
+  - إمّا اعتماد NuGet lock files رسميًا، أو ترك cache معطل في .NET setup.
+
+## الحالة 11: فشل CI في `npm ci` (EUSAGE / package-lock not in sync)
+
+- **الأعراض**
+  - `npm ci` يفشل برسالة:
+    - `package.json and package-lock.json are not in sync`
+    - `Missing: @angular/animations@19.2.18 from lock file`
+- **السبب الجذري**
+  - تعارض peer dependencies بين Angular 20 وحزم ABP/ngx-datatable المتوقعة لإصدار 19 في سياق npm@10 داخل GitHub Runner.
+- **الملفات المتأثرة**
+  - `.github/workflows/ci-cd.yml`
+- **ما تغيّر**
+  - استخدام:
+    - `npm ci --legacy-peer-deps`
+  - في مراحل build/test/security-scan.
+- **لماذا نجح الحل**
+  - `legacy-peer-deps` منع فشل حل الـ peers الصارم في CI.
+- **الوقاية**
+  - الحل الجذري طويل المدى: توحيد نسخ Angular وABP حسب مصفوفة التوافق الرسمية.
+
+## الحالة 12: فشل Frontend lint بسبب `any` في `policy.guard.spec.ts`
+
+- **الأعراض**
+  - `npm run lint` يفشل بقواعد `@typescript-eslint/no-explicit-any`.
+- **السبب الجذري**
+  - استخدام `as any` في route/state داخل الاختبار.
+- **الملفات المتأثرة**
+  - `frontend/src/app/core/guards/policy.guard.spec.ts`
+- **ما تغيّر**
+  - استبدال `any` بأنواع واضحة:
+    - `ActivatedRouteSnapshot`
+    - `RouterStateSnapshot`
+- **لماذا نجح الحل**
+  - التزم الاختبار بقواعد lint الحالية بدون تعطيلها.
+- **الوقاية**
+  - في tests، استخدم casts مقيّدة (`unknown as Type`) بدل `any`.
+
+## الحالة 13: فشل Integration Test لتصدير التقارير (Authorization behavior)
+
+- **الأعراض**
+  - اختبار `Reports_Export_Should_Require_Authorization` يفشل أحيانًا.
+- **السبب الجذري**
+  - في بيئة الاختبار، ABP قد يرمي `AbpAuthorizationException` بدل إرجاع status HTTP مباشر.
+- **الملفات المتأثرة**
+  - `backend/test/SaasSystem.HttpApi.Host.IntegrationTests/HealthAndDashboardTests.cs`
+- **ما تغيّر**
+  - جعل الاختبار يقبل سلوكين صحيحين:
+    - `401/403` إذا رجعت response
+    - أو `AbpAuthorizationException` إذا رُميت exception
+- **لماذا نجح الحل**
+  - صار الاختبار يعكس سلوك ABP الحقيقي في TestHost.
+- **الوقاية**
+  - اختبارات authorization يجب أن تتعامل مع pipeline behavior وليس status code فقط.
+
+## الحالة 14: خطأ SQL `Database 'SaasSystemDb' does not exist`
+
+- **الأعراض**
+  - تنفيذ سكربت إنشاء user/login يفشل في `USE [SaasSystemDb]`.
+- **السبب الجذري**
+  - اسم قاعدة البيانات في السكربت لا يطابق الاسم الفعلي على الجهاز (`SaasSystem_Dev`).
+- **الملفات المتأثرة**
+  - إعدادات البيئة المحلية `.env`
+  - سكربت SQL المحلي في SSMS
+- **ما تغيّر**
+  - استخدام اسم DB الصحيح (`SaasSystem_Dev`).
+  - إنشاء:
+    - `LOGIN [saas_user]`
+    - `USER [saas_user] FOR LOGIN [saas_user]`
+    - إضافة أدوار `db_datareader`, `db_datawriter`
+- **لماذا نجح الحل**
+  - الاتصال صار صحيحًا، والباكند اشتغل بنجاح على نفس القاعدة.
+- **الوقاية**
+  - قبل أي سكربت `USE [db]` تأكد من الاسم الفعلي من Object Explorer.
+
+## الحالة 15: فشل build محلي بسبب ملف DLL مقفول (File Lock)
+
+- **الأعراض**
+  - أخطاء MSBuild مثل `MSB3021/MSB3027` مع رسالة `file is being used by another process`.
+- **السبب الجذري**
+  - عملية `SaasSystem.HttpApi.Host` كانت تعمل مسبقًا وتقفل ملفات `bin/Debug`.
+- **الحل الفوري**
+  - إيقاف العملية القديمة ثم إعادة التشغيل:
+    - `Stop-Process -Id <PID> -Force`
+    - ثم `dotnet run`
+- **الوقاية**
+  - قبل إعادة build/run، تأكد ما في نسخة host قديمة شغالة بنفس مسار build.
+
 ---
 
 ## 3) أخطاء محتملة مستقبلًا وكيف تصلحها

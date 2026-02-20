@@ -210,3 +210,5 @@ Default local users after seeding (same password from `SAASSYSTEM_DEFAULT_PASSWO
 Detailed technical documentation is available in:
 
 - `docs/PROJECT_DOCUMENTATION.md`
+- `docs/TROUBLESHOOTING_AR.md`
+- `docs/OPERATIONS_RUNBOOK_AR.md`
