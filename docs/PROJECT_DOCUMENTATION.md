@@ -71,7 +71,6 @@ All tenant-scoped aggregates include:
 Permission hierarchy:
 
 - `SaasSystem.Dashboard`
-- `SaasSystem.Cars`
 - `SaasSystem.Users`
 - `SaasSystem.Orders`
 - `SaasSystem.Settings`
@@ -93,8 +92,6 @@ Permission hierarchy:
 | Route | Policy |
 |---|---|
 | `/dashboard` | `SaasSystem.Dashboard` |
-| `/cars` | `SaasSystem.Cars` |
-| `/car-details/:id` | `SaasSystem.Cars` |
 | `/users` | `SaasSystem.Users` |
 | `/orders` | `SaasSystem.Orders` |
 | `/settings` | `SaasSystem.Settings` |

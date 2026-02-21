@@ -27,7 +27,7 @@ describe('policyGuard', () => {
     router = TestBed.inject(Router);
   });
 
-  function execute(requiredPolicy?: string, url = '/cars') {
+  function execute(requiredPolicy?: string, url = '/customers') {
     const route = { data: requiredPolicy ? { requiredPolicy } : {} } as unknown as ActivatedRouteSnapshot;
     const state = { url } as RouterStateSnapshot;
     return TestBed.runInInjectionContext(() => policyGuard(route, state));
@@ -38,18 +38,18 @@ describe('policyGuard', () => {
   });
 
   it('redirects unauthenticated users to login route', () => {
-    const result = execute('SaasSystem.Cars', '/cars') as UrlTree;
+    const result = execute('SaasSystem.Customers', '/customers') as UrlTree;
     const url = router.serializeUrl(result);
 
     expect(url).toContain('/account/login');
-    expect(url).toContain('returnUrl=%2Fcars');
+    expect(url).toContain('returnUrl=%2Fcustomers');
   });
 
   it('allows authenticated users with granted policy', async () => {
     authService.isAuthenticated = true;
     permissionService.getGrantedPolicy$.and.returnValue(of(true));
 
-    const result$ = execute('SaasSystem.Cars') as Observable<boolean | UrlTree>;
+    const result$ = execute('SaasSystem.Customers') as Observable<boolean | UrlTree>;
     const result = await firstValueFrom(result$);
     expect(result).toBeTrue();
   });
@@ -58,7 +58,7 @@ describe('policyGuard', () => {
     authService.isAuthenticated = true;
     permissionService.getGrantedPolicy$.and.returnValue(of(false));
 
-    const result$ = execute('SaasSystem.Cars') as Observable<boolean | UrlTree>;
+    const result$ = execute('SaasSystem.Customers') as Observable<boolean | UrlTree>;
     const result = await firstValueFrom(result$);
     expect(router.serializeUrl(result as UrlTree)).toBe('/dashboard');
   });

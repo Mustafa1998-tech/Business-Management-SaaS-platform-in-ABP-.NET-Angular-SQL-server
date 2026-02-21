@@ -20,4 +20,28 @@ public class ProjectController : ControllerBase
     {
         return await _service.GetListAsync(input);
     }
+
+    [HttpGet("{id:guid}")]
+    public async Task<ProjectDto> GetAsync(Guid id)
+    {
+        return await _service.GetAsync(id);
+    }
+
+    [HttpPost]
+    public async Task<ProjectDto> CreateAsync([FromBody] CreateUpdateProjectDto input)
+    {
+        return await _service.CreateAsync(input);
+    }
+
+    [HttpPut("{id:guid}")]
+    public async Task<ProjectDto> UpdateAsync(Guid id, [FromBody] CreateUpdateProjectDto input)
+    {
+        return await _service.UpdateAsync(id, input);
+    }
+
+    [HttpDelete("{id:guid}")]
+    public async Task DeleteAsync(Guid id)
+    {
+        await _service.DeleteAsync(id);
+    }
 }

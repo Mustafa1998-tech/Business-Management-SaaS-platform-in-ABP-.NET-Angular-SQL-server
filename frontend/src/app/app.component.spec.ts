@@ -49,7 +49,6 @@ describe('AppComponent', () => {
   it('shows all sidebar pages for host admin', () => {
     const allPolicies = [
       'SaasSystem.Dashboard',
-      'SaasSystem.Cars',
       'SaasSystem.Users',
       'SaasSystem.Orders',
       'SaasSystem.Settings',
@@ -66,7 +65,7 @@ describe('AppComponent', () => {
     const visiblePaths = component.visibleNavigationItems.map(item => item.path);
 
     expect(visiblePaths).toContain('/administration');
-    expect(component.visibleNavigationItems.length).toBe(12);
+    expect(component.visibleNavigationItems.length).toBe(11);
   });
 
   it('shows only user scope pages for tenant user', () => {
@@ -97,7 +96,6 @@ describe('AppComponent', () => {
   it('hides administration menu for tenant users even with policy grant', () => {
     const allPolicies = [
       'SaasSystem.Dashboard',
-      'SaasSystem.Cars',
       'SaasSystem.Users',
       'SaasSystem.Orders',
       'SaasSystem.Settings',

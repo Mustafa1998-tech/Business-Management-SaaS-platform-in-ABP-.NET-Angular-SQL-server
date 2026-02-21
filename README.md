@@ -164,7 +164,6 @@ The app now enforces ABP policy checks in both UI and API:
 Policies mapped to routes:
 
 - `SaasSystem.Dashboard` -> `/dashboard`
-- `SaasSystem.Cars` -> `/cars`, `/car-details/:id`
 - `SaasSystem.Users` -> `/users`
 - `SaasSystem.Orders` -> `/orders`
 - `SaasSystem.Settings` -> `/settings`

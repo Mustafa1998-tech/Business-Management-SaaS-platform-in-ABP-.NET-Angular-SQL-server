@@ -44,7 +44,6 @@ public class AuthorizationPoliciesTests
     [Fact]
     public void New_Page_Policies_Should_Be_Defined_As_Constants()
     {
-        SaasSystemPermissions.Cars.Default.Should().Be("SaasSystem.Cars");
         SaasSystemPermissions.Users.Default.Should().Be("SaasSystem.Users");
         SaasSystemPermissions.Orders.Default.Should().Be("SaasSystem.Orders");
         SaasSystemPermissions.Settings.Default.Should().Be("SaasSystem.Settings");

@@ -11,7 +11,6 @@ public class SaasSystemPermissionDefinitionProvider : PermissionDefinitionProvid
         var group = context.AddGroup(SaasSystemPermissions.GroupName, L("Permission:SaasSystem"));
 
         group.AddPermission(SaasSystemPermissions.Dashboard.Default, L("Permission:Dashboard"));
-        group.AddPermission(SaasSystemPermissions.Cars.Default, L("Permission:Cars"));
         group.AddPermission(SaasSystemPermissions.Users.Default, L("Permission:Users"));
         group.AddPermission(SaasSystemPermissions.Orders.Default, L("Permission:Orders"));
         group.AddPermission(SaasSystemPermissions.Settings.Default, L("Permission:Settings"));

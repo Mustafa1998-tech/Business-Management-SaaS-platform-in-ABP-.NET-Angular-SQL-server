@@ -25,7 +25,6 @@ public class SaasSystemIdentityDataSeedContributor : IDataSeedContributor, ITran
     private static readonly string[] AdminPermissions =
     {
         "SaasSystem.Dashboard",
-        "SaasSystem.Cars",
         "SaasSystem.Users",
         "SaasSystem.Orders",
         "SaasSystem.Settings",

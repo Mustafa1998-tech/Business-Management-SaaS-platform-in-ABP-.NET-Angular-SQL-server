@@ -24,6 +24,11 @@ public class Payment : FullAuditedAggregateRoot<Guid>, IMultiTenant
         : base(id)
     {
         TenantId = tenantId;
+        Update(invoiceId, amount, paidAt, method, referenceNumber);
+    }
+
+    public void Update(Guid invoiceId, decimal amount, DateTime paidAt, PaymentMethod method, string referenceNumber)
+    {
         InvoiceId = invoiceId;
         Amount = amount;
         PaidAt = paidAt;

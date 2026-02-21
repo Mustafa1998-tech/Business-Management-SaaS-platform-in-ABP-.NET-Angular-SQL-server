@@ -24,18 +24,6 @@ const routes: Routes = [
     loadChildren: () => import('./features/dashboard/dashboard.module').then(m => m.DashboardModule)
   },
   {
-    path: 'cars',
-    canActivate: [abpOAuthGuard, policyGuard],
-    data: { requiredPolicy: 'SaasSystem.Cars' },
-    loadChildren: () => import('./features/cars/cars.module').then(m => m.CarsModule)
-  },
-  {
-    path: 'car-details/:id',
-    canActivate: [abpOAuthGuard, policyGuard],
-    data: { requiredPolicy: 'SaasSystem.Cars' },
-    loadChildren: () => import('./features/car-details/car-details.module').then(m => m.CarDetailsModule)
-  },
-  {
     path: 'users',
     canActivate: [abpOAuthGuard, policyGuard],
     data: { requiredPolicy: 'SaasSystem.Users' },

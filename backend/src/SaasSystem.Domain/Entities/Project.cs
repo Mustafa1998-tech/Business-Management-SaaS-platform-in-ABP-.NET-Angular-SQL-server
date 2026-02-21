@@ -27,12 +27,17 @@ public class Project : FullAuditedAggregateRoot<Guid>, IMultiTenant
         : base(id)
     {
         TenantId = tenantId;
+        Update(customerId, name, description, startDate, budget);
+        Status = ProjectStatus.Planned;
+    }
+
+    public void Update(Guid customerId, string name, string description, DateTime startDate, decimal budget)
+    {
         CustomerId = customerId;
         Name = Check.NotNullOrWhiteSpace(name, nameof(name), maxLength: SaasSystemConsts.NameMaxLength);
         Description = Check.NotNullOrWhiteSpace(description, nameof(description), maxLength: SaasSystemConsts.DescriptionMaxLength);
         StartDate = startDate;
         Budget = budget;
-        Status = ProjectStatus.Planned;
     }
 
     public void ChangeStatus(ProjectStatus status)

@@ -39,6 +39,19 @@ public class Invoice : FullAuditedAggregateRoot<Guid>, IMultiTenant
         : base(id)
     {
         TenantId = tenantId;
+        Update(customerId, projectId, invoiceNumber, issueDate, dueDate, subTotal, taxAmount);
+        Status = InvoiceStatus.Draft;
+    }
+
+    public void Update(
+        Guid customerId,
+        Guid? projectId,
+        string invoiceNumber,
+        DateTime issueDate,
+        DateTime dueDate,
+        decimal subTotal,
+        decimal taxAmount)
+    {
         CustomerId = customerId;
         ProjectId = projectId;
         InvoiceNumber = Check.NotNullOrWhiteSpace(invoiceNumber, nameof(invoiceNumber), maxLength: SaasSystemConsts.InvoiceNumberMaxLength);
@@ -47,7 +60,6 @@ public class Invoice : FullAuditedAggregateRoot<Guid>, IMultiTenant
         SubTotal = subTotal;
         TaxAmount = taxAmount;
         TotalAmount = subTotal + taxAmount;
-        Status = InvoiceStatus.Draft;
     }
 
     public void ChangeStatus(InvoiceStatus status)

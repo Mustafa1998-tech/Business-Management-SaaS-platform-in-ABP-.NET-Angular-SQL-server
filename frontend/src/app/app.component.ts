@@ -20,7 +20,6 @@ interface NavigationItem {
 export class AppComponent implements OnDestroy {
   readonly navigationItems: NavigationItem[] = [
     { label: 'Dashboard', path: '/dashboard', requiredPolicy: 'SaasSystem.Dashboard' },
-    { label: 'Cars / Products', path: '/cars', requiredPolicy: 'SaasSystem.Cars' },
     { label: 'Users', path: '/users', requiredPolicy: 'SaasSystem.Users' },
     { label: 'Orders', path: '/orders', requiredPolicy: 'SaasSystem.Orders' },
     { label: 'Settings', path: '/settings', requiredPolicy: 'SaasSystem.Settings' },
@@ -83,8 +82,6 @@ export class AppComponent implements OnDestroy {
   private updateBreadcrumb(): void {
     const pathToLabel: Record<string, string> = {
       dashboard: 'Dashboard',
-      cars: 'Cars',
-      'car-details': 'Car Details',
       login: 'Login',
       account: 'Account',
       users: 'Users',

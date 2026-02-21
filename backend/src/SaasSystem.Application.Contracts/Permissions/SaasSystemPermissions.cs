@@ -9,11 +9,6 @@ public static class SaasSystemPermissions
         public const string Default = GroupName + ".Dashboard";
     }
 
-    public static class Cars
-    {
-        public const string Default = GroupName + ".Cars";
-    }
-
     public static class Users
     {
         public const string Default = GroupName + ".Users";

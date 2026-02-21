@@ -35,13 +35,7 @@ public class SaasSystemDataSeeder : ITransientDependency
 
     public async Task SeedAsync()
     {
-        if (await _dbContext.Customers.AnyAsync())
-        {
-            _logger.LogInformation("Seed skipped because data already exists.");
-            return;
-        }
-
-        foreach (Guid tenantId in SaasSystemSeedTenants.TenantIds)
+        foreach (Guid? tenantId in SaasSystemSeedTenants.WithHost())
         {
             using (_currentTenant.Change(tenantId))
             {
@@ -50,27 +44,45 @@ public class SaasSystemDataSeeder : ITransientDependency
         }
     }
 
-    private async Task SeedTenantAsync(Guid tenantId)
+    private async Task SeedTenantAsync(Guid? tenantId)
     {
+        if (await _dbContext.Customers.AnyAsync())
+        {
+            _logger.LogInformation("Seed skipped for tenant {Tenant} because data already exists.", tenantId?.ToString() ?? "host");
+            return;
+        }
+
         using IUnitOfWork uow = _unitOfWorkManager.Begin(requiresNew: true, isTransactional: true);
 
-        TenantProfile tenant = new(_guidGenerator.Create(), tenantId, $"Tenant {tenantId.ToString()[..8]}", "Enterprise");
+        string tenantName = tenantId.HasValue
+            ? $"Tenant {tenantId.Value.ToString()[..8]}"
+            : "Host Workspace";
+        string tenantCode = tenantId.HasValue
+            ? tenantId.Value.ToString()[..4]
+            : "HOST";
+
+        TenantProfile tenant = new(_guidGenerator.Create(), tenantId, tenantName, "Enterprise");
         await _dbContext.TenantProfiles.AddAsync(tenant);
 
         DateTime dataStart = new(DateTime.UtcNow.Year - 5, 1, 1);
         int reportableDays = Math.Max(365, (DateTime.UtcNow.Date - dataStart.Date).Days);
-        Random rng = new(tenantId.GetHashCode());
+        Random rng = new((tenantId ?? Guid.Empty).GetHashCode());
 
         List<Customer> customers = new();
-        for (int i = 1; i <= 120; i++)
+        for (int i = 1; i <= 160; i++)
         {
             Customer customer = new(
                 _guidGenerator.Create(),
                 tenantId,
                 $"Customer {i:000}",
-                $"customer{i:000}@tenant{tenantId.ToString()[..4]}.com",
+                $"customer{i:000}@tenant{tenantCode.ToLowerInvariant()}.com",
                 $"+1-555-{rng.Next(1000, 9999)}",
                 $"{rng.Next(10, 999)} Main Street");
+
+            if (i % 9 == 0)
+            {
+                customer.SetActive(false);
+            }
 
             customers.Add(customer);
         }
@@ -86,7 +98,7 @@ public class SaasSystemDataSeeder : ITransientDependency
 
         foreach (Customer customer in customers)
         {
-            int projectCount = rng.Next(3, 8);
+            int projectCount = rng.Next(4, 10);
             for (int p = 1; p <= projectCount; p++)
             {
                 DateTime projectStart = dataStart.AddDays(rng.Next(0, reportableDays));
@@ -108,7 +120,7 @@ public class SaasSystemDataSeeder : ITransientDependency
 
                 projects.Add(project);
 
-                int taskCount = rng.Next(20, 65);
+                int taskCount = rng.Next(25, 70);
                 for (int t = 1; t <= taskCount; t++)
                 {
                     WorkTask task = new(
@@ -128,7 +140,7 @@ public class SaasSystemDataSeeder : ITransientDependency
                     tasks.Add(task);
                 }
 
-                int invoiceCount = rng.Next(6, 19);
+                int invoiceCount = rng.Next(8, 21);
                 for (int inv = 1; inv <= invoiceCount; inv++)
                 {
                     DateTime issueDate = dataStart.AddDays(rng.Next(0, reportableDays));
@@ -140,7 +152,7 @@ public class SaasSystemDataSeeder : ITransientDependency
                         tenantId,
                         customer.Id,
                         project.Id,
-                        $"INV-{tenantId.ToString()[..4]}-{invoiceCounter:00000}",
+                        $"INV-{tenantCode}-{invoiceCounter:00000}",
                         issueDate,
                         issueDate.AddDays(30),
                         subTotal,
